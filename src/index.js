@@ -3,7 +3,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 var lightbox = new SimpleLightbox('.gallery a');
 
-import { fetchImages } from './fetchImages.js'
+import { fetchImages } from './fetchImages.js';
 
 const inputRef = document.body.querySelector('input[type="text"]');
 const formRef = document.body.querySelector('.search-form');
@@ -58,7 +58,16 @@ function renderImages(images) {
       })
       .join('');
 
-      galleryRef.insertAdjacentHTML('beforeend', markup);
+    galleryRef.insertAdjacentHTML('beforeend', markup);
+
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
   } else {
     Notify.failure(
       "We're sorry, but you've reached the end of search results."
