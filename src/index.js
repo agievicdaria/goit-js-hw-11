@@ -75,14 +75,6 @@ function renderImages(images) {
   }
 }
 
-// async function fetchImages(trimmedValue, pageNumber) {
-//   return await axios
-//     .get(
-//       `${URL}?key=${API_KEY}&q=${trimmedValue}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${pageNumber}`
-//     )
-//     .then(({ data }) => data);
-// }
-
 function clearGallery() {
   pageNumber = 1;
   galleryRef.innerHTML = '';
