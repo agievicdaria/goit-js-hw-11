@@ -29,6 +29,7 @@ p{
     height: 30px;
     border-radius: 3px;
     border: none;
+    cursor: pointer;
 }
 
 .search-form {
@@ -40,7 +41,6 @@ p{
 
 .load-more {
     display: flex;
-    visibility: hidden;
     margin: 10px auto;
 }
 
@@ -50,6 +50,7 @@ p{
     gap: 10px;
     margin-left: 20px;
     margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .photo-card {

@@ -12,11 +12,13 @@ const btnLoadMoreRef = document.body.querySelector('.load-more');
 
 let pageNumber = 1;
 
+btnLoadMoreRef.style.display = 'none';
+
 formRef.addEventListener('submit', e => {
   e.preventDefault();
+  btnLoadMoreRef.style.display = 'none';
   clearGallery();
   searchAndRenderImages();
-  onSuccessMessage();
 });
 
 const searchAndRenderImages = async () => {
@@ -25,6 +27,7 @@ const searchAndRenderImages = async () => {
   if (images.hits.length > 0) {
     renderImages(images.hits);
     lightbox.refresh();
+    Notify.success(`Hooray! We found ${images.totalHits} images.`);
   } else {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
@@ -32,16 +35,7 @@ const searchAndRenderImages = async () => {
   }
 };
 
-const onSuccessMessage = async () => {
-  const trimmedValue = inputRef.value.trim();
-  const images = await fetchImages(trimmedValue, pageNumber);
-  if (images.hits.length > 0) {
-    Notify.success(`Hooray! We found ${images.totalHits} images.`);
-  }
-};
-
 function renderImages(images) {
-  if (images.length > 0) {
     const markup = images
       .map(image => {
         return `<div class="photo-card">
@@ -69,9 +63,10 @@ function renderImages(images) {
       .join('');
 
     galleryRef.insertAdjacentHTML('beforeend', markup);
-    console.log(pageNumber);
 
-    onInfinityScroll();
+    btnLoadMoreRef.style.display = 'block';
+
+    console.log(pageNumber);
 
     const { height: cardHeight } = document
       .querySelector('.gallery')
@@ -81,28 +76,28 @@ function renderImages(images) {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
-  } else {
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
-  }
 }
 
 function clearGallery() {
-  galleryRef.innerHTML = '';
   pageNumber = 1;
+  galleryRef.innerHTML = '';
 }
 
-function onInfinityScroll() {
-  const observer = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        pageNumber += 1
-        
-        searchAndRenderImages();
-      }
-    }
-  });
+btnLoadMoreRef.addEventListener('click', e => {
+  e.preventDefault();
+  onLoadMore()
+})
 
-  observer.observe(btnLoadMoreRef);
+async function onLoadMore() {
+  pageNumber += 1;
+  const trimmedValue = inputRef.value.trim();
+  const images = await fetchImages(trimmedValue, pageNumber);
+  renderImages(images.hits);
+  lightbox.refresh();
+
+  const imagesValue = document.body.querySelectorAll('.photo-card');
+  if(images.totalHits === imagesValue.length) {
+    btnLoadMoreRef.style.display = 'none';
+    Notify.failure("We're sorry, but you've reached the end of search results.");
+  }
 }
