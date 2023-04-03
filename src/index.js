@@ -24,7 +24,6 @@ const searchAndRenderImages = async () => {
   const images = await fetchImages(trimmedValue, pageNumber);
   if (images.hits.length > 0) {
     renderImages(images.hits);
-    onInfinityScroll();
     lightbox.refresh();
   } else {
     Notify.failure(
@@ -70,6 +69,9 @@ function renderImages(images) {
       .join('');
 
     galleryRef.insertAdjacentHTML('beforeend', markup);
+    console.log(pageNumber);
+
+    onInfinityScroll();
 
     const { height: cardHeight } = document
       .querySelector('.gallery')
@@ -87,15 +89,16 @@ function renderImages(images) {
 }
 
 function clearGallery() {
-  pageNumber = 1;
   galleryRef.innerHTML = '';
+  pageNumber = 1;
 }
 
 function onInfinityScroll() {
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) {
       if (entry.isIntersecting) {
-        pageNumber += 1;
+        pageNumber += 1
+        
         searchAndRenderImages();
       }
     }
