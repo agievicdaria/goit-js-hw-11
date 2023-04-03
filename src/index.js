@@ -15,20 +15,31 @@ let pageNumber = 1;
 formRef.addEventListener('submit', e => {
   e.preventDefault();
   clearGallery();
-  const trimmedValue = inputRef.value.trim();
-  fetchImages(trimmedValue, pageNumber).then(data => {
-    if (data.hits.length > 0) {
-      renderImages(data.hits);
-      onInfinityScroll();
-      Notify.success(`Hooray! We found ${data.totalHits} images.`);
-      lightbox.refresh();
-    } else {
-      Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    }
-  });
+  searchAndRenderImages();
+  onSuccessMessage();
 });
+
+const searchAndRenderImages = async () => {
+  const trimmedValue = inputRef.value.trim();
+  const images = await fetchImages(trimmedValue, pageNumber);
+  if (images.hits.length > 0) {
+    renderImages(images.hits);
+    onInfinityScroll();
+    lightbox.refresh();
+  } else {
+    Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
+};
+
+const onSuccessMessage = async () => {
+  const trimmedValue = inputRef.value.trim();
+  const images = await fetchImages(trimmedValue, pageNumber);
+  if (images.hits.length > 0) {
+    Notify.success(`Hooray! We found ${images.totalHits} images.`);
+  }
+};
 
 function renderImages(images) {
   if (images.length > 0) {
@@ -85,10 +96,7 @@ function onInfinityScroll() {
     for (const entry of entries) {
       if (entry.isIntersecting) {
         pageNumber += 1;
-        const trimmedValue = inputRef.value.trim();
-        fetchImages(trimmedValue, pageNumber).then(data => {
-          renderImages(data.hits);
-        });
+        searchAndRenderImages();
       }
     }
   });
